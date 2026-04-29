@@ -3,171 +3,63 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>スケジュール調整ツール</title>
+    <title>スケ調整くん</title>
     <style>
-        :root {
-            --primary-color: #00b900; /* LINE風の緑 */
-            --bg-color: #f4f7f6;
-        }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: var(--bg-color);
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-        }
-        .card {
-            background: white;
-            padding: 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            width: 100%;
-            max-width: 400px;
-        }
-        h2 { margin-top: 0; color: #333; font-size: 1.2rem; text-align: center; }
-        .field { margin-bottom: 16px; }
-        label { display: block; font-size: 0.9rem; margin-bottom: 4px; color: #666; }
-        input[type="date"], button, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 1rem;
-        }
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-        .checkbox-group input { width: auto; }
-        button {
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            font-weight: bold;
-            cursor: pointer;
-            margin-top: 8px;
-            transition: opacity 0.2s;
-        }
-        button:active { opacity: 0.7; }
-        button.secondary {
-            background-color: #555;
-            margin-top: 12px;
-        }
-        textarea {
-            height: 180px;
-            margin-top: 20px;
-            background: #fafafa;
-            font-size: 0.85rem;
-            line-height: 1.5;
-        }
-        .loading {
-            text-align: center;
-            font-size: 0.8rem;
-            color: var(--primary-color);
-            display: none;
-            margin-top: 10px;
-        }
+        body { font-family: sans-serif; background: #f0f2f5; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; font-size: 1.1rem; }
+        label { display: block; margin: 10px 0 5px; font-size: 0.8rem; color: #666; }
+        input, button, textarea { width: 100%; padding: 10px; border-radius: 5px; border: 1px solid #ddd; box-sizing: border-box; font-size: 1rem; }
+        button { background: #00b900; color: white; border: none; font-weight: bold; margin-top: 10px; cursor: pointer; }
+        textarea { height: 150px; margin-top: 15px; font-size: 0.9rem; }
+        .copy-btn { background: #555; }
     </style>
 </head>
 <body>
-
 <div class="card">
-    <h2>📅 スケジュール調整くん</h2>
-    
-    <div class="field">
-        <label>開始日</label>
-        <input type="date" id="start">
-    </div>
-    
-    <div class="field">
-        <label>終了日</label>
-        <input type="date" id="end">
-    </div>
-
-    <div class="field">
-        <label class="checkbox-group">
-            <input type="checkbox" id="combined" checked> 連続する時間をまとめる
-        </label>
-    </div>
-
-    <button onclick="generate()">空き時間を抽出する</button>
-    <div id="loader" class="loading">カレンダーを確認中...</div>
-
-    <textarea id="result" readonly placeholder="ここに調整用の文章が生成されます"></textarea>
-    
-    <button class="secondary" onclick="copyText()">テキストをコピー</button>
+    <h2>📅 スケジュール調整</h2>
+    <label>開始日</label><input type="date" id="start">
+    <label>終了日</label><input type="date" id="end">
+    <label style="display:flex; align-items:center; gap:5px;">
+        <input type="checkbox" id="combined" checked style="width:auto;"> 時間をまとめる
+    </label>
+    <button onclick="generate()">空き時間を抽出</button>
+    <textarea id="result" readonly></textarea>
+    <button class="copy-btn" onclick="copyText()">テキストをコピー</button>
 </div>
 
 <script>
-    // --- 設定 ---
+    // 【重要】新しいデプロイURLに書き換えてください
     const GAS_URL = "https://script.google.com/macros/s/AKfycbym3uMCi_ZHcSDi-E4QOsOr45pg9MJr0FvkIyGiNSwY3SDMh5aQpzJeTXecHTlfzNVb/exec"; 
 
-    // 初期値の設定（今日から1週間後）
-    const today = new Date();
-    const nextWeek = new Date();
-    nextWeek.setDate(today.getDate() + 7);
-    
-    document.getElementById('start').valueAsDate = today;
-    document.getElementById('end').valueAsDate = nextWeek;
+    // 初期日付セット
+    const d = new Date();
+    document.getElementById('start').valueAsDate = d;
+    const next = new Date(); next.setDate(d.getDate() + 7);
+    document.getElementById('end').valueAsDate = next;
 
-    // テキスト生成処理
     function generate() {
         const start = document.getElementById('start').value;
         const end = document.getElementById('end').value;
         const combined = document.getElementById('combined').checked;
-        const loader = document.getElementById('loader');
-
-        if (!start || !end) {
-            alert("日付を入力してください");
-            return;
-        }
-
-        loader.style.display = "block";
-        document.getElementById('result').value = "";
-
-        // JSONPによるCORS回避呼び出し
+        
+        // JSONP実行
         const script = document.createElement('script');
         script.src = `${GAS_URL}?start=${start}&end=${end}&combined=${combined}&callback=handleResponse`;
         document.body.appendChild(script);
-        
-        // エラーハンドリング（タイムアウトなど）
-        script.onerror = () => {
-            alert("通信エラーが発生しました。GASのURLやデプロイ設定を確認してください。");
-            loader.style.display = "none";
-        };
+        document.body.removeChild(script); 
     }
 
-    // GASからのレスポンス受け取り
     function handleResponse(data) {
-        document.getElementById('loader').style.display = "none";
         document.getElementById('result').value = data;
-        
-        // 自動で末尾までスクロール
-        const scriptTags = document.querySelectorAll('script[src*="callback=handleResponse"]');
-        scriptTags.forEach(tag => tag.remove());
     }
 
-    // コピー機能
     function copyText() {
-        const resultText = document.getElementById('result');
-        if (!resultText.value) return;
-
-        resultText.select();
-        resultText.setSelectionRange(0, 99999); // スマホ対応
-
-        navigator.clipboard.writeText(resultText.value).then(() => {
-            alert("コピーしました！LINEに貼り付けてください。");
-        }).catch(err => {
-            // クリップボードAPIが使えない場合のフォールバック
-            document.execCommand('copy');
-            alert("コピーしました！");
-        });
+        const area = document.getElementById('result');
+        area.select();
+        document.execCommand('copy');
+        alert("コピーしました！");
     }
 </script>
-
 </body>
 </html>
