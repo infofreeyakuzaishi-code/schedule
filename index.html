@@ -29,7 +29,7 @@
 </div>
 
 <script>
-    // 【重要】新しいデプロイURLに書き換えてください
+    // 【重要】ご自身のデプロイURLをここに！
     const GAS_URL = "https://script.google.com/macros/s/AKfycbym3uMCi_ZHcSDi-E4QOsOr45pg9MJr0FvkIyGiNSwY3SDMh5aQpzJeTXecHTlfzNVb/exec"; 
 
     // 初期日付セット
@@ -39,23 +39,46 @@
     document.getElementById('end').valueAsDate = next;
 
     function generate() {
+        const btn = document.querySelector('button[onclick="generate()"]');
+        const resultArea = document.getElementById('result');
         const start = document.getElementById('start').value;
         const end = document.getElementById('end').value;
         const combined = document.getElementById('combined').checked;
+
+        // --- 処理中の演出 ---
+        btn.disabled = true;           // ボタンを押せなくする
+        btn.innerText = "抽出中...";    // ボタンの文字を変える
+        resultArea.value = "カレンダーを確認しています。少々お待ちください..."; 
         
         // JSONP実行
         const script = document.createElement('script');
         script.src = `${GAS_URL}?start=${start}&end=${end}&combined=${combined}&callback=handleResponse`;
+        
+        // 通信エラー対策
+        script.onerror = () => {
+            alert("通信に失敗しました。URLを確認してください。");
+            resetButton();
+        };
+        
         document.body.appendChild(script);
         document.body.removeChild(script); 
     }
 
     function handleResponse(data) {
         document.getElementById('result').value = data;
+        resetButton(); // ボタンを元に戻す
+    }
+
+    function resetButton() {
+        const btn = document.querySelector('button[onclick="generate()"]');
+        btn.disabled = false;
+        btn.innerText = "空き時間を抽出";
     }
 
     function copyText() {
         const area = document.getElementById('result');
+        if(!area.value || area.value.includes("お待ちください")) return;
+        
         area.select();
         document.execCommand('copy');
         alert("コピーしました！");
