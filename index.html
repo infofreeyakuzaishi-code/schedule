@@ -13,6 +13,10 @@
         button { background: #00b900; color: white; border: none; font-weight: bold; margin-top: 10px; cursor: pointer; }
         textarea { height: 150px; margin-top: 15px; font-size: 0.9rem; }
         .copy-btn { background: #555; }
+        /* チェックボックスを横並びにするためのスタイル */
+        .option-group { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+        .checkbox-label { display: flex; align-items: center; gap: 3px; font-size: 0.8rem; color: #333; margin: 0; cursor: pointer; }
+        .checkbox-label input { width: auto; padding: 0; }
     </style>
 </head>
 <body>
@@ -20,16 +24,25 @@
     <h2>📅 スケジュール調整</h2>
     <label>開始日</label><input type="date" id="start">
     <label>終了日</label><input type="date" id="end">
-    <label style="display:flex; align-items:center; gap:5px;">
-        <input type="checkbox" id="combined" checked style="width:auto;"> 時間をまとめる
+
+    <!-- 追加：曜日・祝日の選択オプション -->
+    <label>抽出対象の設定</label>
+    <div class="option-group">
+        <label class="checkbox-label"><input type="checkbox" id="inc_sat"> 土曜含む</label>
+        <label class="checkbox-label"><input type="checkbox" id="inc_sun"> 日曜含む</label>
+        <label class="checkbox-label"><input type="checkbox" id="inc_hol"> 祝日含む</label>
+    </div>
+
+    <label class="checkbox-label" style="margin-bottom: 10px;">
+        <input type="checkbox" id="combined" checked> 時間をまとめる
     </label>
+
     <button onclick="generate()">空き時間を抽出</button>
     <textarea id="result" readonly></textarea>
     <button class="copy-btn" onclick="copyText()">テキストをコピー</button>
 </div>
 
 <script>
-    // 【重要】ご自身のデプロイURLをここに！
     const GAS_URL = "https://script.google.com/macros/s/AKfycbym3uMCi_ZHcSDi-E4QOsOr45pg9MJr0FvkIyGiNSwY3SDMh5aQpzJeTXecHTlfzNVb/exec"; 
 
     // 初期日付セット
@@ -45,14 +58,19 @@
         const end = document.getElementById('end').value;
         const combined = document.getElementById('combined').checked;
 
+        // 追加：チェックボックスの状態を取得
+        const sat = document.getElementById('inc_sat').checked;
+        const sun = document.getElementById('inc_sun').checked;
+        const hol = document.getElementById('inc_hol').checked;
+
         // --- 処理中の演出 ---
-        btn.disabled = true;           // ボタンを押せなくする
-        btn.innerText = "抽出中...";    // ボタンの文字を変える
+        btn.disabled = true;
+        btn.innerText = "抽出中...";
         resultArea.value = "カレンダーを確認しています。少々お待ちください..."; 
         
-        // JSONP実行
+        // JSONP実行（パラメータに sat, sun, hol を追加）
         const script = document.createElement('script');
-        script.src = `${GAS_URL}?start=${start}&end=${end}&combined=${combined}&callback=handleResponse`;
+        script.src = `${GAS_URL}?start=${start}&end=${end}&combined=${combined}&sat=${sat}&sun=${sun}&hol=${hol}&callback=handleResponse`;
         
         // 通信エラー対策
         script.onerror = () => {
@@ -66,7 +84,7 @@
 
     function handleResponse(data) {
         document.getElementById('result').value = data;
-        resetButton(); // ボタンを元に戻す
+        resetButton();
     }
 
     function resetButton() {
