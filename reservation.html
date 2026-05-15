@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>予約スケジュール調整</title>
+    <title>薬剤師ろぎー 日程調整システム</title>
     <style>
         :root {
             --primary-color: #00b900;
@@ -39,11 +39,21 @@
             to { opacity: 1; transform: translateY(0); }
         }
 
-        h2 {
+        .header-area {
             text-align: center;
             margin-bottom: 25px;
+        }
+
+        h2 {
+            margin: 0 0 10px 0;
             font-weight: 700;
             letter-spacing: -0.5px;
+        }
+
+        .system-desc {
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            line-height: 1.5;
         }
 
         label {
@@ -71,7 +81,6 @@
             box-shadow: 0 0 0 3px rgba(0, 185, 0, 0.1);
         }
 
-        /* スタイリッシュな光るボタン */
         .btn-shine {
             position: relative;
             overflow: hidden;
@@ -83,7 +92,7 @@
             font-weight: 700;
             cursor: pointer;
             transition: all 0.3s;
-            margin-top: 10px;
+            margin-top: 20px;
             width: 100%;
         }
 
@@ -108,30 +117,6 @@
         .btn-shine:hover::after {
             left: 120%;
             transition: 0.7s;
-        }
-
-        .option-group {
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            margin-bottom: 10px;
-        }
-
-        .check-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            background: #f1f5f9;
-            padding: 6px 12px;
-            border-radius: 20px;
-            transition: 0.2s;
-        }
-
-        .check-item:has(input:checked) {
-            background: #eaffea;
-            color: var(--primary-color);
         }
 
         #menu-desc {
@@ -169,13 +154,29 @@
         }
 
         #step2, #reserve-form { display: none; }
+        
+        .notice-badge {
+            display: inline-block;
+            background: #fee2e2;
+            color: #ef4444;
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div id="step1">
-        <h2>📅 Schedule Setup</h2>
+        <div class="header-area">
+            <h2>📅 Schedule Setup</h2>
+            <p class="system-desc">
+                こちらは<strong>薬剤師ろぎー</strong>との日程調整システムです。<br>
+                ご希望のメニューと期間を選択してください。
+            </p>
+        </div>
         
         <label>1. メニューを選択</label>
         <select id="menu" onchange="updateMenuDescription()">
@@ -186,16 +187,11 @@
         <div id="menu-desc">短い時間でも効果的に情報交換したい方向け。事前の準備なしで気軽にお話ししましょう。</div>
 
         <label>2. 期間を選択</label>
+        <div class="notice-badge">※土日祝は定休日となります</div>
         <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
             <input type="date" id="start">
             <span style="color: #cbd5e1;">ー</span>
             <input type="date" id="end">
-        </div>
-        
-        <div class="option-group">
-            <label class="check-item"><input type="checkbox" id="sat"> 土曜</label>
-            <label class="check-item"><input type="checkbox" id="sun"> 日曜</label>
-            <label class="check-item"><input type="checkbox" id="hol"> 祝日</label>
         </div>
 
         <button class="btn-shine" onclick="loadSlots()">空き日程を確認する</button>
@@ -224,7 +220,6 @@
     let finalStart = null;
     let finalEnd = null;
 
-    // 初期日付設定
     const d = new Date();
     document.getElementById('start').valueAsDate = d;
     const next = new Date(); next.setDate(d.getDate() + 7);
@@ -244,9 +239,9 @@
         const p = {
             start: document.getElementById('start').value,
             end: document.getElementById('end').value,
-            sat: document.getElementById('sat').checked,
-            sun: document.getElementById('sun').checked,
-            hol: document.getElementById('hol').checked,
+            sat: 'false', // 土日は常に除外
+            sun: 'false',
+            hol: 'false', // 祝日も除外
             action: 'list'
         };
 
