@@ -3,146 +3,349 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>面談予約システム</title>
+    <title>予約スケジュール調整</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f9; padding: 15px; display: flex; justify-content: center; }
-        .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); width: 100%; max-width: 450px; }
-        h2 { text-align: center; color: #333; margin-bottom: 20px; }
-        label { display: block; margin: 10px 0 5px; font-size: 0.85rem; font-weight: bold; }
-        input, button, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; margin-bottom: 10px; box-sizing: border-box; }
-        .slot-btn { background: #fff; color: #00b900; border: 2px solid #00b900; cursor: pointer; margin-bottom: 8px; font-size: 0.9rem; text-align: left; transition: 0.2s; }
-        .slot-btn:hover { background: #eaffea; }
-        .slot-btn.selected { background: #00b900; color: #fff; }
-        #reserve-form { display: none; border-top: 2px solid #eee; margin-top: 20px; padding-top: 20px; }
-        .btn-submit { background: #00b900; color: white; border: none; font-weight: bold; }
-        .btn-submit:disabled { background: #ccc; }
-        .option-group { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
-        .check-item { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; }
-        .check-item input { width: auto; margin: 0; }
+        :root {
+            --primary-color: #00b900;
+            --primary-hover: #009e00;
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #334155;
+            --text-sub: #64748b;
+        }
+
+        body {
+            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            width: 100%;
+            max-width: 480px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            text-align: center;
+            margin-bottom: 25px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        label {
+            display: block;
+            margin: 20px 0 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-sub);
+        }
+
+        input[type="date"], select, textarea, input[type="text"], input[type="email"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: #fdfdfd;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 185, 0, 0.1);
+        }
+
+        /* スタイリッシュな光るボタン */
+        .btn-shine {
+            position: relative;
+            overflow: hidden;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+            width: 100%;
+        }
+
+        .btn-shine:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 185, 0, 0.3);
+        }
+
+        .btn-shine::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 20%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(30deg);
+            transition: 0s;
+        }
+
+        .btn-shine:hover::after {
+            left: 120%;
+            transition: 0.7s;
+        }
+
+        .option-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .check-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            background: #f1f5f9;
+            padding: 6px 12px;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+
+        .check-item:has(input:checked) {
+            background: #eaffea;
+            color: var(--primary-color);
+        }
+
+        #menu-desc {
+            font-size: 0.8rem;
+            color: var(--text-sub);
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-color);
+            margin-bottom: 15px;
+            line-height: 1.5;
+        }
+
+        .slot-btn {
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 8px;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .slot-btn:hover {
+            border-color: var(--primary-color);
+            background: #f0fff0;
+        }
+
+        .slot-btn.selected {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        #step2, #reserve-form { display: none; }
     </style>
 </head>
 <body>
+
 <div class="card">
-    <h2>📅 面談予約</h2>
-    
-    <label>1. 期間を選択</label>
-    <div style="display: flex; gap: 5px;">
-        <input type="date" id="start"> <span>〜</span> <input type="date" id="end">
-    </div>
-    
-    <div class="option-group">
-        <label class="check-item"><input type="checkbox" id="sat">土曜</label>
-        <label class="check-item"><input type="checkbox" id="sun">日曜</label>
-        <label class="check-item"><input type="checkbox" id="hol">祝日</label>
-        <label class="check-item"><input type="checkbox" id="comb" checked>時間をまとめる</label>
+    <div id="step1">
+        <h2>📅 Schedule Setup</h2>
+        
+        <label>1. メニューを選択</label>
+        <select id="menu" onchange="updateMenuDescription()">
+            <option value="30" data-desc="短い時間でも効果的に情報交換したい方向け。事前の準備なしで気軽にお話ししましょう。">① 30分パワー1on1</option>
+            <option value="60" data-desc="お互いしっかり時間をかけて、近況報告や深いディスカッションをしたい方向け。">② 60分1on1</option>
+            <option value="60_c" data-desc="ろぎーへ体質改善や健康管理、お薬に関する具体的な相談をしたい方向け。">③ 60分カウンセリング</option>
+        </select>
+        <div id="menu-desc">短い時間でも効果的に情報交換したい方向け。事前の準備なしで気軽にお話ししましょう。</div>
+
+        <label>2. 期間を選択</label>
+        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
+            <input type="date" id="start">
+            <span style="color: #cbd5e1;">ー</span>
+            <input type="date" id="end">
+        </div>
+        
+        <div class="option-group">
+            <label class="check-item"><input type="checkbox" id="sat"> 土曜</label>
+            <label class="check-item"><input type="checkbox" id="sun"> 日曜</label>
+            <label class="check-item"><input type="checkbox" id="hol"> 祝日</label>
+        </div>
+
+        <button class="btn-shine" onclick="loadSlots()">空き日程を確認する</button>
     </div>
 
-    <button onclick="loadSlots()">空き時間を表示</button>
-    
-    <div id="slot-container"></div>
+    <div id="step2">
+        <h2>🕒 Select Time</h2>
+        <p id="display-menu-name" style="text-align:center; font-size: 0.9rem; color: var(--primary-color); font-weight: bold;"></p>
+        <div id="slot-container" style="max-height: 300px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;"></div>
+        <button onclick="backToStep1()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; width:100%; font-size:0.9rem;">← 戻って条件を変える</button>
+    </div>
 
     <div id="reserve-form">
-        <label>2. 予約者情報を入力</label>
+        <label>3. 予約者情報を入力</label>
+        <p id="final-time-display" style="background:#eaffea; padding:10px; border-radius:8px; color:var(--primary-color); font-weight:bold; font-size:0.9rem; text-align:center;"></p>
         <input type="text" id="name" placeholder="お名前">
         <input type="email" id="email" placeholder="メールアドレス">
-        <textarea id="memo" placeholder="備考（あれば）" style="width:100%; height:60px; border-radius:8px; border:1px solid #ddd; padding:10px; box-sizing:border-box; margin-bottom:10px;"></textarea>
-        <p id="selected-time-display" style="font-size: 0.9rem; color: #00b900; font-weight: bold;"></p>
-        <button class="btn-submit" id="submit-btn" onclick="submitReservation()">予約を確定する</button>
+        <textarea id="memo" placeholder="備考・ご相談内容など"></textarea>
+        <button class="btn-shine" id="submit-btn" onclick="submitReservation()">予約を確定する</button>
     </div>
 </div>
 
 <script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwd1wLeT6ulr5C-VSiTr5lai2O0M51wvOy9I3-8WP_qMpuTZ2eHgBd41LZeeeDCjMWCZA/exec"; 
-    let selectedSlot = null;
+    let rawSlots = [];
+    let finalStart = null;
+    let finalEnd = null;
 
-    // 初期日付セット
+    // 初期日付設定
     const d = new Date();
     document.getElementById('start').valueAsDate = d;
     const next = new Date(); next.setDate(d.getDate() + 7);
     document.getElementById('end').valueAsDate = next;
 
+    function updateMenuDescription() {
+        const menuEl = document.getElementById('menu');
+        const selectedOption = menuEl.options[menuEl.selectedIndex];
+        document.getElementById('menu-desc').innerText = selectedOption.getAttribute('data-desc');
+    }
+
     function loadSlots() {
+        const btn = document.querySelector('button[onclick="loadSlots()"]');
+        btn.disabled = true;
+        btn.innerText = "Searching...";
+
         const p = {
             start: document.getElementById('start').value,
             end: document.getElementById('end').value,
             sat: document.getElementById('sat').checked,
             sun: document.getElementById('sun').checked,
             hol: document.getElementById('hol').checked,
-            combined: document.getElementById('comb').checked,
             action: 'list'
         };
 
-        const container = document.getElementById('slot-container');
-        container.innerHTML = "読み込み中...";
-        document.getElementById('reserve-form').style.display = "none";
-
         callGas(p, (res) => {
-            container.innerHTML = "";
-            if (res.slots.length === 0) {
-                container.innerHTML = "空き時間がありません。";
-                return;
-            }
-            res.slots.forEach(slot => {
-                const btn = document.createElement('button');
-                btn.className = "slot-btn";
-                const start = new Date(slot.start);
-                const end = new Date(slot.end);
-                const timeStr = `${start.getMonth()+1}/${start.getDate()}(${['日','月','火','水','木','金','土'][start.getDay()]}) ${start.getHours()}:${String(start.getMinutes()).padStart(2,'0')}〜${end.getHours()}:${String(end.getMinutes()).padStart(2,'0')}`;
-                btn.innerText = "・" + timeStr;
-                btn.onclick = () => selectSlot(slot, timeStr, btn);
-                container.appendChild(btn);
-            });
+            rawSlots = res.slots;
+            btn.disabled = false;
+            btn.innerText = "空き日程を確認する";
+            showSplitSlots();
         });
     }
 
-    function selectSlot(slot, label, btn) {
-        selectedSlot = slot;
-        document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        document.getElementById('reserve-form').style.display = "block";
-        document.getElementById('selected-time-display').innerText = "選択中: " + label;
+    function showSplitSlots() {
+        const container = document.getElementById('slot-container');
+        const menuSelect = document.getElementById('menu');
+        const duration = menuSelect.value.includes('30') ? 30 : 60;
+        
+        container.innerHTML = "";
+        document.getElementById('step1').style.display = "none";
+        document.getElementById('step2').style.display = "block";
+        document.getElementById('display-menu-name').innerText = menuSelect.options[menuSelect.selectedIndex].text;
+
+        if (!rawSlots || rawSlots.length === 0) {
+            container.innerHTML = "<p style='text-align:center; color:#94a3b8;'>空き時間がありません。</p>";
+            return;
+        }
+
+        rawSlots.forEach(bigSlot => {
+            let current = new Date(bigSlot.start);
+            const endLimit = new Date(bigSlot.end);
+
+            while (new Date(current.getTime() + duration * 60000) <= endLimit) {
+                const sTime = new Date(current);
+                const eTime = new Date(current.getTime() + duration * 60000);
+                
+                const btn = document.createElement('button');
+                btn.className = "slot-btn";
+                const label = `${sTime.getMonth()+1}/${sTime.getDate()}(${['日','月','火','水','木','金','土'][sTime.getDay()]}) ${sTime.getHours()}:${String(sTime.getMinutes()).padStart(2,'0')}〜${eTime.getHours()}:${String(eTime.getMinutes()).padStart(2,'0')}`;
+                btn.innerText = label;
+                btn.onclick = () => {
+                    finalStart = sTime.toISOString();
+                    finalEnd = eTime.toISOString();
+                    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    document.getElementById('reserve-form').style.display = "block";
+                    document.getElementById('final-time-display').innerText = "確定： " + label;
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                };
+                container.appendChild(btn);
+                current.setMinutes(current.getMinutes() + 30);
+            }
+        });
     }
 
     function submitReservation() {
         const name = document.getElementById('name').value;
         const email = document.getElementById('email').value;
-        const memo = document.getElementById('memo').value;
-        if (!name || !email) { alert("名前とメールアドレスを入力してください"); return; }
+        if (!name || !email) { alert("お名前とメールアドレスを入力してください"); return; }
 
         const btn = document.getElementById('submit-btn');
         btn.disabled = true;
-        btn.innerText = "予約中...";
+        btn.innerText = "予約を確定中...";
 
         const p = {
             action: 'reserve',
-            startTime: selectedSlot.start,
-            endTime: selectedSlot.end,
+            startTime: finalStart,
+            endTime: finalEnd,
+            menuTitle: document.getElementById('menu').options[document.getElementById('menu').selectedIndex].text,
             name: name,
             email: email,
-            memo: memo
+            memo: document.getElementById('memo').value
         };
 
         callGas(p, (res) => {
             if (res.success) {
-                alert("予約が完了しました！カレンダーをご確認ください。");
+                alert("予約が完了しました！メールをご確認ください。");
                 location.reload();
             } else {
-                alert("エラーが発生しました: " + res.error);
+                alert("エラー: " + res.error);
                 btn.disabled = false;
                 btn.innerText = "予約を確定する";
             }
         });
     }
 
+    function backToStep1() {
+        document.getElementById('step1').style.display = "block";
+        document.getElementById('step2').style.display = "none";
+        document.getElementById('reserve-form').style.display = "none";
+    }
+
     function callGas(params, callbackName) {
-        const callbackId = "cb_" + Date.now();
-        window[callbackId] = (data) => {
+        const cbId = "cb_" + Date.now();
+        window[cbId] = (data) => {
             callbackName(data);
-            delete window[callbackId];
+            delete window[cbId];
         };
         const query = Object.keys(params).map(k => `${k}=${encodeURIComponent(params[k])}`).join('&');
         const script = document.createElement('script');
-        script.src = `${GAS_URL}?${query}&callback=${callbackId}`;
+        script.src = `${GAS_URL}?${query}&callback=${cbId}`;
         document.body.appendChild(script);
         document.body.removeChild(script);
     }
