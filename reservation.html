@@ -3,347 +3,309 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>薬剤師ろぎー 日程調整システム</title>
+    <title>ご縁マッチング | Connection Search</title>
     <style>
         :root {
-            --primary-color: #00b900;
-            --primary-hover: #009e00;
-            --bg-color: #f8fafc;
+            --primary-color: #2563eb;
+            --cta-color: #10b981;
+            --bg-color: #f1f5f9;
             --card-bg: #ffffff;
-            --text-main: #334155;
+            --text-main: #1e293b;
             --text-sub: #64748b;
+            --accent-red: #ef4444;
+            
+            /* SNS・連絡先用カラー */
+            --line-color: #06c755;
+            --insta-color: #e1306c;
+            --mail-color: #475569;
         }
 
         body {
-            font-family: 'Helvetica Neue', Arial, 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', Meiryo, sans-serif;
+            font-family: 'Helvetica Neue', Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", Meiryo, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             margin: 0;
-            padding: 20px;
             display: flex;
             justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
         }
 
-        .card {
+        .container {
+            width: 90%;
+            max-width: 420px;
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            width: 100%;
-            max-width: 480px;
-            animation: fadeIn 0.5s ease-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .header-area {
+            padding: 48px 32px;
+            border-radius: 32px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
             text-align: center;
-            margin-bottom: 25px;
+            box-sizing: border-box;
+        }
+
+        .header-icon {
+            font-size: 56px;
+            margin-bottom: 20px;
+            display: inline-block;
         }
 
         h2 {
-            margin: 0 0 10px 0;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            font-size: 1.6rem;
+            font-weight: 800;
+            margin: 0 0 12px 0;
+            letter-spacing: -0.02em;
         }
 
-        .system-desc {
-            font-size: 0.9rem;
+        .description {
+            font-size: 0.95rem;
             color: var(--text-sub);
-            line-height: 1.5;
+            line-height: 1.7;
+            margin-bottom: 36px;
         }
 
-        label {
-            display: block;
-            margin: 20px 0 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--text-sub);
+        .search-box {
+            margin-bottom: 32px;
         }
 
-        input[type="date"], select, textarea, input[type="text"], input[type="email"] {
+        input {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
             box-sizing: border-box;
-            font-size: 1rem;
+            padding: 18px 22px;
+            border: 2px solid #e2e8f0;
+            border-radius: 16px;
+            font-size: 16px;
             transition: all 0.3s;
-            background: #fdfdfd;
-        }
-
-        input:focus, select:focus {
             outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(0, 185, 0, 0.1);
+            background: #f8fafc;
         }
 
-        .btn-shine {
-            position: relative;
-            overflow: hidden;
+        input:focus {
+            border-color: var(--primary-color);
+            background: #fff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .search-btn {
+            width: 100%;
+            padding: 18px;
             background: var(--primary-color);
             color: white;
             border: none;
-            padding: 14px;
-            border-radius: 12px;
+            border-radius: 16px;
+            font-size: 1.1rem;
             font-weight: 700;
             cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 20px;
-            width: 100%;
+            transition: all 0.2s;
+            margin-top: 14px;
         }
 
-        .btn-shine:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 185, 0, 0.3);
+        .search-btn:active {
+            transform: scale(0.97);
         }
 
-        .btn-shine::after {
-            content: "";
-            position: absolute;
-            top: -50%;
-            left: -60%;
-            width: 20%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(30deg);
-            transition: 0s;
-        }
-
-        .btn-shine:hover::after {
-            left: 120%;
-            transition: 0.7s;
-        }
-
-        #menu-desc {
-            font-size: 0.8rem;
-            color: var(--text-sub);
-            background: #f8fafc;
-            padding: 12px;
-            border-radius: 10px;
-            border-left: 4px solid var(--primary-color);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-
-        .slot-btn {
-            background: #fff;
-            border: 1px solid #e2e8f0;
-            padding: 12px;
-            border-radius: 10px;
-            margin-bottom: 8px;
-            width: 100%;
+        /* 外部リンク・SNSボタンセクション */
+        .links-section {
+            margin-top: 32px;
+            padding-top: 24px;
+            border-top: 1px solid #e2e8f0;
             text-align: left;
-            cursor: pointer;
+        }
+
+        .links-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-sub);
+            margin-bottom: 12px;
+            text-align: center;
+            letter-spacing: 0.05em;
+        }
+
+        .link-card {
+            display: flex;
+            align-items: center;
+            padding: 14px 18px;
+            margin-bottom: 10px;
+            border-radius: 14px;
+            text-decoration: none;
+            color: var(--text-main);
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            font-weight: 600;
             transition: all 0.2s;
         }
 
-        .slot-btn:hover {
-            border-color: var(--primary-color);
-            background: #f0fff0;
+        .link-card:active {
+            transform: scale(0.98);
+            background: #f1f5f9;
         }
 
-        .slot-btn.selected {
-            background: var(--primary-color);
+        .link-card .icon {
+            font-size: 1.25rem;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+
+        .link-card.line { border-left: 4px solid var(--line-color); }
+        .link-card.insta { border-left: 4px solid var(--insta-color); }
+        .link-card.mail { border-left: 4px solid var(--mail-color); }
+
+        /* 検索結果エリア */
+        #result {
+            display: none;
+            margin-top: 36px;
+            padding-top: 36px;
+            border-top: 1px dashed #cbd5e1;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .result-text {
+            font-size: 1.05rem;
+            font-weight: 600;
+            line-height: 1.8;
+            color: var(--text-main);
+        }
+
+        .count-number {
+            font-size: 3.8rem;
+            font-weight: 900;
+            color: var(--accent-red);
+            line-height: 1;
+            display: block;
+            margin: 16px 0;
+        }
+
+        .cta-message {
+            font-weight: 700;
+            font-size: 1rem;
+            line-height: 1.6;
+            margin: 24px 0;
+            color: var(--text-main);
+        }
+
+        .cta-button {
+            display: block;
+            background: var(--cta-color);
             color: white;
-            border-color: var(--primary-color);
+            text-decoration: none;
+            padding: 20px;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1.15rem;
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.3);
+            transition: all 0.2s;
         }
 
-        #step2, #reserve-form { display: none; }
-        
-        .notice-badge {
-            display: inline-block;
-            background: #fee2e2;
-            color: #ef4444;
-            font-size: 0.75rem;
-            padding: 2px 8px;
-            border-radius: 4px;
-            margin-bottom: 10px;
+        .cta-button:active {
+            transform: translateY(2px);
+        }
+
+        .loading {
+            display: none;
+            margin-top: 24px;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: 0.1em;
         }
     </style>
 </head>
 <body>
-
-<div class="card">
-    <div id="step1">
-        <div class="header-area">
-            <h2>📅 Schedule Setup</h2>
-            <p class="system-desc">
-                こちらは<strong>薬剤師ろぎー</strong>との日程調整システムです。<br>
-                ご希望のメニューと期間を選択してください。
-            </p>
+    <div class="container">
+        <div class="header-icon">💎</div>
+        <h2>ご縁マッチング検索</h2>
+        <p class="description">
+            私の人脈ネットワーク（2020年〜）から、<br>
+            あなたに最適な候補をリアルタイムで照合します。
+        </p>
+        
+        <div class="search-box">
+            <input type="text" id="keyword" placeholder="例：誠実, 明るい, エンジニア">
+            <button onclick="searchConnections()" class="search-btn">照合を開始する</button>
         </div>
         
-        <label>1. メニューを選択</label>
-        <select id="menu" onchange="updateMenuDescription()">
-            <option value="30" data-desc="短い時間でも効果的に情報交換したい方向け。事前の準備なしで気軽にお話ししましょう。">① 30分パワー1on1</option>
-            <option value="60" data-desc="お互いしっかり時間をかけて、近況報告や深いディスカッションをしたい方向け。">② 60分1on1</option>
-            <option value="60_c" data-desc="ろぎーへ体質改善や健康管理、お薬に関する具体的な相談をしたい方向け。">③ 60分カウンセリング</option>
-        </select>
-        <div id="menu-desc">短い時間でも効果的に情報交換したい方向け。事前の準備なしで気軽にお話ししましょう。</div>
+        <div id="loading" class="loading">TAKARAMONO LIST 照合中...</div>
 
-        <label>2. 期間を選択</label>
-        <div class="notice-badge">※土日祝や時間外をご希望の際は個別にご連絡ください。</div>
-        <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 10px;">
-            <input type="date" id="start">
-            <span style="color: #cbd5e1;">ー</span>
-            <input type="date" id="end">
+        <div id="result">
+            <div class="result-text">
+                私の人脈の宝物リストから<br>キーワード検索で
+            </div>
+            
+            <span id="result-count" class="count-number">0</span>
+            
+            <div class="result-text" style="margin-bottom: 24px;">
+                個 該当がありました。
+            </div>
+            
+            <div id="cta-message-text" class="cta-message">
+                より感度の高いご紹介のためにも、<br>
+                1on1の日程調整をお願いします。
+            </div>
+            
+            <a href="YOUR_SCHEDULE_TOOL_URL" class="cta-button">1on1の日程を調整する</a>
         </div>
 
-        <button class="btn-shine" onclick="loadSlots()">空き日程を確認する</button>
+        <div class="links-section">
+            <div class="links-title">CONTACT & SNS</div>
+            
+            <a href="https://lin.ee/ZFVvxed" class="link-card line" target="_blank">
+                <span class="icon">💬</span> お薬・サプリの相談（公式LINEへ）
+            </a>
+            
+            <a href="https://www.instagram.com/yakuzaishi.loggy/" class="link-card insta" target="_blank">
+                <span class="icon">📸</span> Instagramを見る
+            </a>
+            
+            <a href="mailto:info.freeyakuzaishi@gmail.com" class="link-card mail">
+                <span class="icon">✉️</span> お問い合わせ（メールを開く）
+            </a>
+        </div>
+
     </div>
 
-    <div id="step2">
-        <h2>🕒 Select Time</h2>
-        <p id="display-menu-name" style="text-align:center; font-size: 0.9rem; color: var(--primary-color); font-weight: bold;"></p>
-        <div id="slot-container" style="max-height: 300px; overflow-y: auto; padding-right: 5px; margin-bottom: 15px;"></div>
-        <button onclick="backToStep1()" style="background:none; border:none; color:var(--text-sub); cursor:pointer; width:100%; font-size:0.9rem;">← 戻って条件を変える</button>
-    </div>
+    <script>
+        function searchConnections() {
+            const q = document.getElementById('keyword').value;
+            const loading = document.getElementById('loading');
+            const resultDiv = document.getElementById('result');
+            const countDisplay = document.getElementById('result-count');
+            const ctaMessage = document.getElementById('cta-message-text');
+            
+            if(!q) return alert("キーワードを入力してください");
 
-    <div id="reserve-form">
-        <label>3. 予約者情報を入力</label>
-        <p id="final-time-display" style="background:#eaffea; padding:10px; border-radius:8px; color:var(--primary-color); font-weight:bold; font-size:0.9rem; text-align:center;"></p>
-        <input type="text" id="name" placeholder="お名前">
-        <input type="email" id="email" placeholder="メールアドレス">
-        <textarea id="memo" placeholder="備考・ご相談内容など"></textarea>
-        <button class="btn-shine" id="submit-btn" onclick="submitReservation()">予約を確定する</button>
-    </div>
-</div>
+            // GASのウェブアプリURLをここに貼り付け
+            const apiUrl = 'YOUR_GAS_WEB_APP_URL'; 
 
-<script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbzkrEJ7dVbWkEYvxW7lE8Pu8REcsWelbscCZtQAwpIYTKQtzs0VeIYw9QnHJFbBPxfWHA/exec"; 
-    let rawSlots = [];
-    let finalStart = null;
-    let finalEnd = null;
+            loading.style.display = 'block';
+            resultDiv.style.display = 'none';
 
-    const d = new Date();
-    document.getElementById('start').valueAsDate = d;
-    const next = new Date(); next.setDate(d.getDate() + 7);
-    document.getElementById('end').valueAsDate = next;
-
-    function updateMenuDescription() {
-        const menuEl = document.getElementById('menu');
-        const selectedOption = menuEl.options[menuEl.selectedIndex];
-        document.getElementById('menu-desc').innerText = selectedOption.getAttribute('data-desc');
-    }
-
-    function loadSlots() {
-        const btn = document.querySelector('button[onclick="loadSlots()"]');
-        btn.disabled = true;
-        btn.innerText = "Searching...";
-
-        const p = {
-            start: document.getElementById('start').value,
-            end: document.getElementById('end').value,
-            sat: 'false', // 土日は常に除外
-            sun: 'false',
-            hol: 'false', // 祝日も除外
-            action: 'list'
-        };
-
-        callGas(p, (res) => {
-            rawSlots = res.slots;
-            btn.disabled = false;
-            btn.innerText = "空き日程を確認する";
-            showSplitSlots();
-        });
-    }
-
-    function showSplitSlots() {
-        const container = document.getElementById('slot-container');
-        const menuSelect = document.getElementById('menu');
-        const duration = menuSelect.value.includes('30') ? 30 : 60;
-        
-        container.innerHTML = "";
-        document.getElementById('step1').style.display = "none";
-        document.getElementById('step2').style.display = "block";
-        document.getElementById('display-menu-name').innerText = menuSelect.options[menuSelect.selectedIndex].text;
-
-        if (!rawSlots || rawSlots.length === 0) {
-            container.innerHTML = "<p style='text-align:center; color:#94a3b8;'>空き時間がありません。</p>";
-            return;
-        }
-
-        rawSlots.forEach(bigSlot => {
-            let current = new Date(bigSlot.start);
-            const endLimit = new Date(bigSlot.end);
-
-            while (new Date(current.getTime() + duration * 60000) <= endLimit) {
-                const sTime = new Date(current);
-                const eTime = new Date(current.getTime() + duration * 60000);
+            fetch(`${apiUrl}?q=${encodeURIComponent(q)}`)
+            .then(res => res.json())
+            .then(data => {
+                loading.style.display = 'none';
+                resultDiv.style.display = 'block';
+                countDisplay.innerText = data.count;
                 
-                const btn = document.createElement('button');
-                btn.className = "slot-btn";
-                const label = `${sTime.getMonth()+1}/${sTime.getDate()}(${['日','月','火','水','木','金','土'][sTime.getDay()]}) ${sTime.getHours()}:${String(sTime.getMinutes()).padStart(2,'0')}〜${eTime.getHours()}:${String(eTime.getMinutes()).padStart(2,'0')}`;
-                btn.innerText = label;
-                btn.onclick = () => {
-                    finalStart = sTime.toISOString();
-                    finalEnd = eTime.toISOString();
-                    document.querySelectorAll('.slot-btn').forEach(b => b.classList.remove('selected'));
-                    btn.classList.add('selected');
-                    document.getElementById('reserve-form').style.display = "block";
-                    document.getElementById('final-time-display').innerText = "確定： " + label;
-                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-                };
-                container.appendChild(btn);
-                current.setMinutes(current.getMinutes() + 30);
-            }
-        });
-    }
-
-    function submitReservation() {
-        const name = document.getElementById('name').value;
-        const email = document.getElementById('email').value;
-        if (!name || !email) { alert("お名前とメールアドレスを入力してください"); return; }
-
-        const btn = document.getElementById('submit-btn');
-        btn.disabled = true;
-        btn.innerText = "予約を確定中...";
-
-        const p = {
-            action: 'reserve',
-            startTime: finalStart,
-            endTime: finalEnd,
-            menuTitle: document.getElementById('menu').options[document.getElementById('menu').selectedIndex].text,
-            name: name,
-            email: email,
-            memo: document.getElementById('memo').value
-        };
-
-        callGas(p, (res) => {
-            if (res.success) {
-                alert("予約が完了しました！メールをご確認ください。");
-                location.reload();
-            } else {
-                alert("エラー: " + res.error);
-                btn.disabled = false;
-                btn.innerText = "予約を確定する";
-            }
-        });
-    }
-
-    function backToStep1() {
-        document.getElementById('step1').style.display = "block";
-        document.getElementById('step2').style.display = "none";
-        document.getElementById('reserve-form').style.display = "none";
-    }
-
-    function callGas(params, callbackName) {
-        const cbId = "cb_" + Date.now();
-        window[cbId] = (data) => {
-            callbackName(data);
-            delete window[cbId];
-        };
-        const query = Object.keys(params).map(k => `${k}=${encodeURIComponent(params[k])}`).join('&');
-        const script = document.createElement('script');
-        script.src = `${GAS_URL}?${query}&callback=${cbId}`;
-        document.body.appendChild(script);
-        document.body.removeChild(script);
-    }
-</script>
+                // 0件かそれ以上かでメッセージを条件分岐
+                if (data.count === 0) {
+                    ctaMessage.innerHTML = `より簡単なキーワードでお試しいただくか、<br>より感度の高いご紹介のためにも、<br>1on1の日程調整をお願いします。`;
+                } else {
+                    ctaMessage.innerHTML = `より感度の高いご紹介のためにも、<br>1on1の日程調整をお願いします。`;
+                }
+            })
+            .catch(err => {
+                loading.style.display = 'none';
+                alert("通信エラーが発生しました。");
+                console.error(err);
+            });
+        }
+    </script>
 </body>
 </html>
