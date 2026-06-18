@@ -215,10 +215,16 @@
 </div>
 
 <script>
+<script>
     const GAS_URL = "https://script.google.com/macros/s/AKfycbwd1wLeT6ulr5C-VSiTr5lai2O0M51wvOy9I3-8WP_qMpuTZ2eHgBd41LZeeeDCjMWCZA/exec"; 
     let rawSlots = [];
     let finalStart = null;
     let finalEnd = null;
+
+    // ★【新規追加】URLからパラメータ（流入元とキーワード）を自動取得
+    const urlParams = new URLSearchParams(window.location.search);
+    const trackingSource = urlParams.get('source') || 'direct'; // 流入元（なければ direct）
+    const trackingKeyword = urlParams.get('keyword') || 'なし';   // 検索単語（なければ なし）
 
     const d = new Date();
     document.getElementById('start').valueAsDate = d;
@@ -239,9 +245,9 @@
         const p = {
             start: document.getElementById('start').value,
             end: document.getElementById('end').value,
-            sat: 'false', // 土日は常に除外
+            sat: 'false',
             sun: 'false',
-            hol: 'false', // 祝日も除外
+            hol: 'false',
             action: 'list'
         };
 
@@ -311,7 +317,10 @@
             menuTitle: document.getElementById('menu').options[document.getElementById('menu').selectedIndex].text,
             name: name,
             email: email,
-            memo: document.getElementById('memo').value
+            memo: document.getElementById('memo').value,
+            // ★【新規追加】追跡用データをGAS側に一緒に送り出す
+            source: trackingSource,
+            keyword: trackingKeyword
         };
 
         callGas(p, (res) => {
@@ -344,6 +353,7 @@
         document.body.appendChild(script);
         document.body.removeChild(script);
     }
+</script>
 </script>
 </body>
 </html>
